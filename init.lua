@@ -144,6 +144,12 @@ vim.o.timeoutlen = 300
 vim.o.splitright = true
 vim.o.splitbelow = true
 
+--tabstop config
+vim.o.tabstop = 8
+vim.o.softtabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
+
 -- Sets how neovim will display certain whitespace characters in the editor.
 --  See `:help 'list'`
 --  and `:help 'listchars'`
@@ -250,7 +256,7 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  -- 'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -736,6 +742,17 @@ require('lazy').setup({
           end,
         },
       }
+      local gdscript_config = {
+        capabilities = capabilities,
+        settings = {},
+        filetypes = { 'gdscript' },
+        root_dir = vim.fs.dirname(vim.fs.find({ 'project.godot', '.git' }, {
+          upward = true,
+          path = vim.fs.dirname(vim.api.nvim_buf_get_name(0)),
+        })[1]),
+      }
+      gdscript_config['cmd'] = { 'godot-wsl-lsp', '--useMirroredNetworking' }
+      require('lspconfig').gdscript.setup(gdscript_config)
     end,
   },
 
@@ -897,7 +914,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'lunaperche'
+      vim.cmd.colorscheme = 'rose-pine'
     end,
   },
 
@@ -976,7 +993,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs'
@@ -1017,3 +1034,9 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+if vim.fn.filereadable(vim.fn.getcwd() .. '/project.godot') == 1 then
+  local addr = './godot.pipe'
+  addr = '127.0.0.1:6005'
+  -- vim.fn.serverstart(addr)
+end
